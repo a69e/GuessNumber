@@ -2,11 +2,11 @@ from flask import Flask, request, render_template
 from guess_number import gen_number, hint_for_web
 
 app = Flask(__name__)
-message_history = []  # To gather all messages received:
-number = gen_number()  # To generate a random 4 digit numbers:
+message_history = []  # To gather all messages received.
+number = gen_number()  # To generate a random 4 digit numbers.
 
 
-# To log all messages and return with one single string:
+# To log all messages and return with one single string.
 def log(message):
     message_history.append(message)
     message_history_in_one_string = "<br />".join(message_history)
@@ -27,4 +27,4 @@ def hello():
 
 
 if __name__ == '__main__':
-    app.run(host='', debug=True)
+    app.run(host='0.0.0.0', debug=True)
