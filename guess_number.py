@@ -1,4 +1,9 @@
 import random
+import time
+from my_db import crud
+
+
+counter = 0  # A global variable to count the call frequency of function hint_for_web.
 
 
 def gen_number():
@@ -29,6 +34,8 @@ def hint(number, guess):
 
 def hint_for_web(number, guess):
     result = [0, 'A', 0, 'B']
+    global counter
+    counter += 1
     for i in range(0, 4):
         if guess[i] == number[i]:
             result[0] += 1
@@ -37,6 +44,9 @@ def hint_for_web(number, guess):
     result[0] = str(result[0])
     result[2] = str(result[2])
     if result[0] == '4' and result[2] == '0':
+        # To insert a record of the total guesses of this game, plus timestamp.
+        crud('insert', ['admin', counter, time.strftime('%Y%b%d %H:%M', time.localtime())])
+        crud('select', ['admin'])
         return str(guess) + " : " + "".join(result) + "<br />You are amazing!<br />Game ended."
     else:
         return str(guess) + " : " + "".join(result)
