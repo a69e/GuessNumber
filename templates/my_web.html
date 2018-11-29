@@ -1,14 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>my_web</title>
+    <script>
+        window.onload = function () {
+            console.log("test");
+            document.forms["guessForm"].number.focus();
+        }
+    </script>
 </head>
 <body>
-    <h3>Please input 4 numbers(e.g. 1234):</h3>
-    <form action='/'>
-    <input type="string" name="number"/>
-    </form>
-    <h3>{{ hint|safe }}</h3>
+<form name="guessForm" action='/'>
+    <h3><label for="numberInput">Please input 4 numbers(e.g. 1234):</label></h3>
+    <input id="numberInput" type="text" name="number"/>
+</form>
+<h3>{{ hint|safe }}</h3>
 </body>
 </html>
