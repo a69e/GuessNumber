@@ -3,18 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <title>Guess Number</title>
+    <!-- bootstrap css framework -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
     <script>
         window.onload = function () {
             console.log("test");
-            document.forms["guessForm"].number.focus();
+            if (document.forms["gameStart"].username.value === "") {
+                document.forms["gameStart"].username.focus();
+            }
+            else {
+                document.forms["guessForm"].number.focus();
+            }
         }
     </script>
 </head>
 <body>
-<form name="guessForm" action='/'>
-    <h3><label for="numberInput">Please input 4 numbers(e.g. 1234):</label></h3>
-    <input id="numberInput" type="text" name="number"/>
-</form>
-<h3>{{ hint|safe }}</h3>
+<div class="container-fluid">
+    <form name="gameStart" action='/gameStart'>
+        <div class="form-inline">
+            <label class="" for="usernameInput">Please input your name:</label>
+            <input class="form-control" id="usernameInput" type="text" name="username" value="{{ username }}"/>
+        </div>
+    </form>
+    <form name="guessForm" action='/'>
+        <div class="form-inline">
+            <label class="" for="numberInput">Try 4 numbers(e.g. 1234):</label>
+            <input class="form-control" id="numberInput" type="text" name="number"/>
+        </div>
+    </form>
+    <div>{{ hint|safe }}</div>
+</div>
 </body>
 </html>
