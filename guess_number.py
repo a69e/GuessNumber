@@ -2,8 +2,8 @@ import random
 import time
 from my_db import crud
 
-
-counter = 0  # A global variable to count the call frequency of function hint_for_web.
+number = None  # To generate a random 4 digit numbers.
+counter = 0  # To count the call frequency of function hint_for_web.
 
 
 def gen_number():
@@ -21,25 +21,25 @@ def take_a_guess():
             return list(guess)
 
 
-def hint(number, guess):
+def hint(answer, guess):
     result = [0, 'A', 0, 'B']
     for i in range(0, 4):
-        if guess[i] == number[i]:
+        if guess[i] == answer[i]:
             result[0] += 1
-        elif guess[i] in number:
+        elif guess[i] in answer:
             result[2] += 1
     print str(result[0]) + result[1] + str(result[2]) + result[3]
     return result
 
 
-def hint_for_web(number, guess):
+def hint_for_web(answer, guess):
     result = [0, 'A', 0, 'B']
     global counter
     counter += 1
     for i in range(0, 4):
-        if guess[i] == number[i]:
+        if guess[i] == answer[i]:
             result[0] += 1
-        elif guess[i] in number:
+        elif guess[i] in answer:
             result[2] += 1
     result[0] = str(result[0])
     result[2] = str(result[2])
@@ -53,9 +53,9 @@ def hint_for_web(number, guess):
 
 
 def game_start():
-    number = gen_number()
+    answer = gen_number()
     while True:
-        result = hint(number, take_a_guess())
+        result = hint(answer, take_a_guess())
         if result[0] == 4 and result[2] == 0:
             print 'You are amazing!'
             break
