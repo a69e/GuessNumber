@@ -1,10 +1,10 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, session
 import guess_number
 
 app = Flask(__name__)
+app.secret_key = 'diudiudiu'
 # TODO: need to move this part to session to support multiple users
 message_history = []  # To gather all messages received.
-username = ""
 
 
 # To log all messages and return with one single string.
@@ -16,38 +16,52 @@ def log(message):
     return message_history_in_one_string
 
 
+@app.route('/login')
+def login():
+    session['username'] = request.args.get('username', '')
+    return render_template('my_web.html', welcome='Welcome, %s!' % session['username'])
+
+
 @app.route('/gameStart')
 def game_start():
-    global message_history, username
-    username = request.args.get('username', '')
-    if username != '':
+    global message_history
+    if 'username' in session:
         guess_number.number = guess_number.gen_number()
         message_history = []
         print guess_number.number
-        return render_template('my_web.html', hint=log("Let's play a game!"), username=username)
+        return render_template('my_web.html', hint=log("Let's play a game!"),
+                               welcome='Welcome, %s!' % session['username'])
     else:
-        return render_template('my_web.html', hint=log("Username is blank!"), username=username)
+        return render_template('login.html')
 
 
 @app.route('/')
-def hello():
-    global message_history, username
-    guess = request.args.get('number', '')
+def play():
+    global message_history
+    if 'username' not in session:
+        return render_template('login.html')
+
     if guess_number.number is None:
-        return render_template('my_web.html', hint=log("Game hasn't started yet. Please enter your name to start "
-                                                       "a new game."), username=username)
+        return render_template('my_web.html', hint=log('Game has not started yet!'),
+                               welcome='Welcome, %s!' % session['username'])
+
+    guess = request.args.get('number', '')
     if guess == '' or not guess.isdigit():
-        return render_template('my_web.html', hint=log('Please enter numbers only!'), username=username)
+        return render_template('my_web.html', hint=log('Please enter numbers only!'),
+                               welcome='Welcome, %s!' % session['username'])
     if len(list(guess)) != 4:
-        return render_template('my_web.html', hint=log('Please enter 4 numbers exactly!'), username=username)
+        return render_template('my_web.html', hint=log('Please enter 4 numbers exactly!'),
+                               welcome='Welcome, %s!' % session['username'])
     if len(list(guess)) != len(set(list(guess))):
-        return render_template('my_web.html', hint=log('Please enter 4 different numbers!'), username=username)
+        return render_template('my_web.html', hint=log('Please enter 4 different numbers!'),
+                               welcome='Welcome, %s!' % session['username'])
 
     result_str = guess_number.hint_for_web(guess_number.number, guess)
     if "Game ended." in result_str:
         guess_number.number = None
         guess_number.counter = 0
-    return render_template('my_web.html', hint=log(result_str), username=username)
+    return render_template('my_web.html', hint=log(result_str),
+                           welcome='Welcome, %s!' % session['username'])
 
 
 if __name__ == '__main__':

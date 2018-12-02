@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <script>
+        window.onload = function () {
+            document.forms["login"].username.focus();
+        }
+    </script>
+</head>
+<body>
+    <form name="login" action='/login'>
+        <div class="form-inline">
+            <label class="" for="login">Please enter your name:</label>
+            <input class="form-control" id="login" type="text" name="username"/>
+        </div>
+    </form>
+</body>
+</html>
