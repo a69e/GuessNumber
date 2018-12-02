@@ -1,5 +1,8 @@
 from flask import Flask, request, render_template, session
+from my_db import crud, show
 import guess_number
+import time
+
 
 app = Flask(__name__)
 app.secret_key = 'diudiudiu'
@@ -12,8 +15,12 @@ def log(message):
     global message_history
     message_history.append(message)
     message_history_in_one_string = "<br />".join(message_history)
-    print message_history
     return message_history_in_one_string
+
+
+# To convert the guess number and result list into one single string.
+def convert(guess, result):
+    return str(guess) + " : " + "".join(result)
 
 
 @app.route('/login')
@@ -56,11 +63,17 @@ def play():
         return render_template('my_web.html', hint=log('Please enter 4 different numbers!'),
                                welcome='Welcome, %s!' % session['username'])
 
-    result_str = guess_number.hint_for_web(guess_number.number, guess)
-    if "Game ended." in result_str:
+    result = guess_number.hint(guess_number.number, guess)
+    if result[0] == '4' and result[2] == '0':
+        # To insert a record of the total guesses of this game, plus timestamp.
+        crud('insert', [session['username'], guess_number.counter, time.strftime('%Y%b%d %H:%M', time.localtime())])
+        show()
         guess_number.number = None
         guess_number.counter = 0
-    return render_template('my_web.html', hint=log(result_str),
+        return render_template('my_web.html', hint=log(convert(guess, result) +
+                                                       '<br />You are amazing!<br />Game ended.'),
+                               welcome='Welcome, %s!' % session['username'])
+    return render_template('my_web.html', hint=log(convert(guess, result)),
                            welcome='Welcome, %s!' % session['username'])
 
 
