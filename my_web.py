@@ -6,16 +6,14 @@ import time
 
 app = Flask(__name__)
 app.secret_key = 'diudiudiu'
-# TODO: need to move this part to session to support multiple users
-message_history = []  # To gather all messages received.
 
 
-# To log all messages and return with one single string.
+# To log new message and append it to all old messages and then return with one single string.
 def log(message):
-    global message_history
+    message_history = session['message_history_in_one_string'].split('<br />')
     message_history.append(message)
-    message_history_in_one_string = "<br />".join(message_history)
-    return message_history_in_one_string
+    session['message_history_in_one_string'] = '<br />'.join(message_history)
+    return session['message_history_in_one_string']
 
 
 # To convert the guess number and result list into one single string.
@@ -26,15 +24,16 @@ def convert(guess, result):
 @app.route('/login')
 def login():
     session['username'] = request.args.get('username', '')
-    return render_template('my_web.html', welcome='Welcome, %s!' % session['username'])
+    session['message_history_in_one_string'] = ''
+    return render_template('my_web.html', hint=log('Welcome to the number guess game! '
+                                                   'Please click "New game!" to start a new game.'),
+                           welcome='Welcome, %s!' % session['username'])
 
 
 @app.route('/gameStart')
 def game_start():
-    global message_history
     if 'username' in session:
         guess_number.number = guess_number.gen_number()
-        message_history = []
         print guess_number.number
         return render_template('my_web.html', hint=log("Let's play a game!"),
                                welcome='Welcome, %s!' % session['username'])
@@ -44,7 +43,6 @@ def game_start():
 
 @app.route('/')
 def play():
-    global message_history
     if 'username' not in session:
         return render_template('login.html')
 
