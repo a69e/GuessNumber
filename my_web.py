@@ -3,7 +3,6 @@ from my_db import crud, recent10
 import guess_number
 import time
 
-
 app = Flask(__name__)
 app.secret_key = 'diudiudiu'
 
@@ -18,7 +17,8 @@ def log(message):
 
 # To convert the guess number and result list into one single string.
 def convert(guess, result):
-    return str(guess) + " : " + "".join(result)
+    session['counter'] = result[4]
+    return '[guess' + result[4] + ']' + str(guess) + " : " + "".join(result[0:4])
 
 
 @app.route('/login')
@@ -48,6 +48,7 @@ def game_start():
     if 'username' in session:
         if session['number'] is None:
             session['number'] = guess_number.gen_number()
+            session['counter'] = 0
             print session['number']
             return render_template('my_web.html', hint=log("Let's play a game!"),
                                    welcome='Welcome, %s!' % session['username'], recent=recent10())
@@ -79,11 +80,11 @@ def play():
     result = guess_number.hint(session['number'], guess, session['counter'])
     if result[0] == '4' and result[2] == '0':
         # To insert a record of the total guesses of this game, plus timestamp.
-        crud('insert', [session['username'], session['counter'], time.strftime('%Y%m%d %H:%M', time.localtime())])
+        crud('insert', [session['username'], result[4], time.strftime('%Y%m%d %H:%M', time.localtime())])
         session['number'] = None
-        session['counter'] = 0
         return render_template('my_web.html', hint=log(convert(guess, result) +
-                                                       '<br />You are amazing!<br />Game ended.'),
+                                                       '<br />You are amazing!<br />You\'ve taken ' + result[4]
+                                                       + ' guesses in total.<br />Game ended.'),
                                welcome='Welcome, %s!' % session['username'], recent=recent10())
     return render_template('my_web.html', hint=log(convert(guess, result)),
                            welcome='Welcome, %s!' % session['username'], recent=recent10())

@@ -19,6 +19,7 @@ def take_a_guess():
 
 
 def hint(answer, guess, counter):
+    counter = int(counter)
     counter += 1
     result = [0, 'A', 0, 'B', str(counter)]
     for i in range(0, 4):
