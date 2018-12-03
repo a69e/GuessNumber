@@ -48,6 +48,8 @@ def recent10():
     cursor = conn.cursor()
     cursor.execute('select * from user order by time desc limit 10')  # 1 values list
     result = cursor.fetchall()
+    cursor.close()
+    conn.close()
     return result
 
 
