@@ -46,7 +46,9 @@
         <div class="col-sm-3">
             <div><h6>{{ welcome|safe }}</h6>
                 <button class="btn btn-outline-info">logon</button>
-                <button class="btn btn-outline-primary">logout</button>
+                <form class="col form-inline" name="userForm" action='/logout'>
+                    <button class="btn btn-outline-primary" type="submit">logout</button>
+                </form>
             </div>
         </div>
     </div>

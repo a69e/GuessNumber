@@ -34,6 +34,15 @@ def login():
                            welcome='Welcome, %s!' % session['username'], recent=recent10())
 
 
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    session.pop('number', None)
+    session.pop('counter', None)
+    session.pop('message_history_in_one_string', None)
+    return render_template('login.html')
+
+
 @app.route('/gameStart')
 def game_start():
     if 'username' in session:
