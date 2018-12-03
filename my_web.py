@@ -37,12 +37,14 @@ def login():
 @app.route('/gameStart')
 def game_start():
     if 'username' in session:
-        session['number'] = guess_number.gen_number()
-        print session['number']
-        return render_template('my_web.html', hint=log("Let's play a game!"),
+        if session['number'] is None:
+            session['number'] = guess_number.gen_number()
+            print session['number']
+            return render_template('my_web.html', hint=log("Let's play a game!"),
+                                   welcome='Welcome, %s!' % session['username'], recent=recent10())
+        return render_template('my_web.html', hint=log("Game has already started!"),
                                welcome='Welcome, %s!' % session['username'], recent=recent10())
-    else:
-        return render_template('login.html')
+    return render_template('login.html')
 
 
 @app.route('/')
