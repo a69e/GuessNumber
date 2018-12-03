@@ -74,4 +74,3 @@ if __name__ == '__main__':
 # crud('select', ['admin'])
 # update('admin', 69)
 # crud('delete', ['admin'])
-

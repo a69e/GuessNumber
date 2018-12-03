@@ -37,7 +37,7 @@ def hint(answer, guess, counter):
 def game_start():
     answer = gen_number()
     while True:
-        result = hint(answer, take_a_guess())
+        result = hint(answer, take_a_guess(), 0)
         if result[0] == 4 and result[2] == 0:
             print 'You are amazing!'
             break
