@@ -42,15 +42,13 @@ def crud(action, params):
     conn.close()
 
 
-# TODO: Seems this is not working! How to show the records in time order?
 # To show latest 10 records for any tables:
-def show():
+def recent10():
     conn = sqlite3.connect('my_db.db')
     cursor = conn.cursor()
-    cursor.execute('select * from user')  # 1 values list
+    cursor.execute('select * from user order by time desc limit 10')  # 1 values list
     result = cursor.fetchall()
-    for i in result:
-        print i
+    return result
 
 
 # Abandoned for now, may use later.
@@ -68,7 +66,7 @@ def update(username, number):
 
 if __name__ == '__main__':
     init()
-    show()
+    recent10()
 # examples:
 # crud('insert', ['admin', 0, '2018Nov28 18:28'])
 # crud('select', ['admin'])

@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, session
-from my_db import crud, show
+from my_db import crud, recent10
 import guess_number
 import time
 
@@ -29,9 +29,9 @@ def login():
     session['number'] = None
     session['counter'] = 0
     session['message_history_in_one_string'] = ''
-    return render_template('my_web.html', hint=log('Welcome to the number guess game! '
-                                                   'Please click "New game!" to start a new game.'),
-                           welcome='Welcome, %s!' % session['username'])
+    return render_template('my_web.html', hint=log('Welcome to the number guess game!<br />'
+                                                   'Please click "New game" to start a new game.'),
+                           welcome='Welcome, %s!' % session['username'], recent=recent10())
 
 
 @app.route('/gameStart')
@@ -40,7 +40,7 @@ def game_start():
         session['number'] = guess_number.gen_number()
         print session['number']
         return render_template('my_web.html', hint=log("Let's play a game!"),
-                               welcome='Welcome, %s!' % session['username'])
+                               welcome='Welcome, %s!' % session['username'], recent=recent10())
     else:
         return render_template('login.html')
 
@@ -52,31 +52,30 @@ def play():
 
     if session['number'] is None:
         return render_template('my_web.html', hint=log('Game has not started yet!'),
-                               welcome='Welcome, %s!' % session['username'])
+                               welcome='Welcome, %s!' % session['username'], recent=recent10())
 
     guess = request.args.get('number', '')
     if guess == '' or not guess.isdigit():
         return render_template('my_web.html', hint=log('Please enter numbers only!'),
-                               welcome='Welcome, %s!' % session['username'])
+                               welcome='Welcome, %s!' % session['username'], recent=recent10())
     if len(list(guess)) != 4:
         return render_template('my_web.html', hint=log('Please enter 4 numbers exactly!'),
-                               welcome='Welcome, %s!' % session['username'])
+                               welcome='Welcome, %s!' % session['username'], recent=recent10())
     if len(list(guess)) != len(set(list(guess))):
         return render_template('my_web.html', hint=log('Please enter 4 different numbers!'),
-                               welcome='Welcome, %s!' % session['username'])
+                               welcome='Welcome, %s!' % session['username'], recent=recent10())
 
     result = guess_number.hint(session['number'], guess, session['counter'])
     if result[0] == '4' and result[2] == '0':
         # To insert a record of the total guesses of this game, plus timestamp.
         crud('insert', [session['username'], session['counter'], time.strftime('%Y%m%d %H:%M', time.localtime())])
-        show()
         session['number'] = None
         session['counter'] = 0
         return render_template('my_web.html', hint=log(convert(guess, result) +
                                                        '<br />You are amazing!<br />Game ended.'),
-                               welcome='Welcome, %s!' % session['username'])
+                               welcome='Welcome, %s!' % session['username'], recent=recent10())
     return render_template('my_web.html', hint=log(convert(guess, result)),
-                           welcome='Welcome, %s!' % session['username'])
+                           welcome='Welcome, %s!' % session['username'], recent=recent10())
 
 
 if __name__ == '__main__':

@@ -63,7 +63,7 @@
                 </form>
 
                 <form class="col form-inline" name="gameStart" action='/gameStart'>
-                    <button class="btn btn-outline-primary" type="submit">Start a new game</button>
+                    <button class="btn btn-outline-primary" type="submit">New game</button>
                 </form>
             </div>
             <div class="row">
@@ -75,7 +75,34 @@
         </div>
 
         <div class="col-sm-4">
-            <h3>Rank:</h3>
+            <h3>Rules:</h3>
+            1. 4 different numbers, 0 can be appeared at the front;<br/>
+            2. You will get a hint as "aAbB", "aA" means there are a numbers are correct and they are
+            in the correct place, and "bB" means there are b number are correct but they are
+            in the wrong place;<br/>
+            3. Game is completed only when you reach "4A0B", which means all 4 numbers are correct and
+            they are in the correct place;<br/>
+            4. Once game is started, if player quit without finishing the game, it will be recorded;<br/>
+            5. You will have to complete at least 10 games in order to rank in the "Personal Best".<br/>
+        </div>
+
+        <div class="col-sm-4">
+            <h3>Recent games played:</h3>
+            (name, steps, time)<br/>
+            {{ recent[0] }}<br/>
+            {{ recent[1] }}<br/>
+            {{ recent[2] }}<br/>
+            {{ recent[3] }}<br/>
+            {{ recent[4] }}<br/>
+            {{ recent[5] }}<br/>
+            {{ recent[6] }}<br/>
+            {{ recent[7] }}<br/>
+            {{ recent[8] }}<br/>
+            {{ recent[9] }}<br/>
+        </div>
+
+        <div class="col-sm-4">
+            <h3>Personal Best:</h3>
             1. a69e 5 2018-12-01<br/>
             2. joesee 6 2018-12-02<br/>
             3. tuoqizai 7 2018-12-03<br/>
