@@ -1,7 +1,6 @@
 import random
 
 number = None  # To generate a random 4 digit numbers.
-counter = 0  # To count the call frequency of function hint_for_web.
 
 
 def gen_number():
@@ -19,10 +18,9 @@ def take_a_guess():
             return list(guess)
 
 
-def hint(answer, guess):
-    result = [0, 'A', 0, 'B']
-    global counter
+def hint(answer, guess, counter):
     counter += 1
+    result = [0, 'A', 0, 'B', str(counter)]
     for i in range(0, 4):
         if guess[i] == answer[i]:
             result[0] += 1

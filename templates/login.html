@@ -11,10 +11,11 @@
 </head>
 <body>
     <form name="login" action='/login'>
-        <div class="form-inline">
-            <label class="" for="login">Please enter your name:</label>
-            <input class="form-control" id="login" type="text" name="username"/>
+        <div>
+            <label>Please enter your name:</label>
+            <input id="login" type="text" name="username"/>
         </div>
+        <div>{{ error }}</div>
     </form>
 </body>
 </html>

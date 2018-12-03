@@ -23,7 +23,11 @@ def convert(guess, result):
 
 @app.route('/login')
 def login():
+    if request.args.get('username', '') == '':
+        return render_template('login.html', error='Name cannot be blank!')
     session['username'] = request.args.get('username', '')
+    session['number'] = None
+    session['counter'] = 0
     session['message_history_in_one_string'] = ''
     return render_template('my_web.html', hint=log('Welcome to the number guess game! '
                                                    'Please click "New game!" to start a new game.'),
@@ -33,8 +37,8 @@ def login():
 @app.route('/gameStart')
 def game_start():
     if 'username' in session:
-        guess_number.number = guess_number.gen_number()
-        print guess_number.number
+        session['number'] = guess_number.gen_number()
+        print session['number']
         return render_template('my_web.html', hint=log("Let's play a game!"),
                                welcome='Welcome, %s!' % session['username'])
     else:
@@ -46,7 +50,7 @@ def play():
     if 'username' not in session:
         return render_template('login.html')
 
-    if guess_number.number is None:
+    if session['number'] is None:
         return render_template('my_web.html', hint=log('Game has not started yet!'),
                                welcome='Welcome, %s!' % session['username'])
 
@@ -61,13 +65,13 @@ def play():
         return render_template('my_web.html', hint=log('Please enter 4 different numbers!'),
                                welcome='Welcome, %s!' % session['username'])
 
-    result = guess_number.hint(guess_number.number, guess)
+    result = guess_number.hint(session['number'], guess, session['counter'])
     if result[0] == '4' and result[2] == '0':
         # To insert a record of the total guesses of this game, plus timestamp.
-        crud('insert', [session['username'], guess_number.counter, time.strftime('%Y%b%d %H:%M', time.localtime())])
+        crud('insert', [session['username'], session['counter'], time.strftime('%Y%m%d %H:%M', time.localtime())])
         show()
-        guess_number.number = None
-        guess_number.counter = 0
+        session['number'] = None
+        session['counter'] = 0
         return render_template('my_web.html', hint=log(convert(guess, result) +
                                                        '<br />You are amazing!<br />Game ended.'),
                                welcome='Welcome, %s!' % session['username'])

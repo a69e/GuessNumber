@@ -47,7 +47,7 @@ def crud(action, params):
 def show():
     conn = sqlite3.connect('my_db.db')
     cursor = conn.cursor()
-    cursor.execute('select * from user order by time limit 10')  # 1 values list
+    cursor.execute('select * from user')  # 1 values list
     result = cursor.fetchall()
     for i in result:
         print i
@@ -68,8 +68,10 @@ def update(username, number):
 
 if __name__ == '__main__':
     init()
+    show()
 # examples:
 # crud('insert', ['admin', 0, '2018Nov28 18:28'])
 # crud('select', ['admin'])
 # update('admin', 69)
 # crud('delete', ['admin'])
+
