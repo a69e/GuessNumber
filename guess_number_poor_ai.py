@@ -357,14 +357,101 @@ def from_4B_to_4A(guess, return_type='string'):  # guess[0][0], guess[0][1], gue
         return ''.join(full_list[0])
 
 
+# TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+def from_2B_to_4A(guess1, guess2):
+    guess3 = hints(guess1[0][1] + guess2[0][0:3])
+
+    if AplusB(guess3) == 3:
+        guess4 = hints(next_best_guess(guess1[0][2] + guess3[0][0:3]))
+
+        if AplusB(guess4) == 4:
+            hints(next_best_guess(guess4))
+
+        if AplusB(guess4) == 3:
+            guess5 = hints(next_best_guess(guess1[0][3] + guess3[0][0:3]))
+            if AplusB(guess5) == 4:
+                hints(next_best_guess(guess5))
+            if AplusB(guess5) == 3:
+                hints(next_best_guess(guess1[0][0] + guess3[0][0:3]))
+            if AplusB(guess5) == 2:
+                guess6 = hints(next_best_guess(guess1[0][1:3] + guess3[0][2:4]))
+                if AplusB(guess6) == 4:
+                    hints(next_best_guess(guess6))
+                if AplusB(guess6) == 3:
+                    hints(next_best_guess(guess1[0][1:3] + guess3[0][1] + guess3[0][3]))
+
+        if AplusB(guess4) == 2:
+            guess5 = hints(next_best_guess(guess1[0][3] + guess3[0][0:2] + guess3[0][3]))
+            if AplusB(guess5) == 4:
+                hints(next_best_guess(guess5))
+            if AplusB(guess5) == 3:
+                guess6 = hints(next_best_guess(guess1[0][0] + guess3[0][3] + guess3[0][0:2]))
+                if AplusB(guess6) == 2:
+                    hints(next_best_guess(guess1[0][3] + guess3[0][0] + guess3[0][2:4]))
+            if AplusB(guess5) == 2:
+                hints(next_best_guess(guess1[0][0:2] + guess3[0][2:4]))
+    else:
+        guess4 = hints(guess2[0][1:4] + guess1[0][2])
+
+        if AplusB(guess3) == 2 and AplusB(guess4) == 3:
+            guess5 = hints(next_best_guess(guess1[0][2:4] + guess2[0][1:3]))
+            if AplusB(guess5) == 3:
+                hints(next_best_guess(guess1[0][0] + guess1[0][2] + guess2[0][1:3]))
+            if AplusB(guess5) == 2:
+                guess6 = hints(next_best_guess(guess1[0][1:3] + guess2[0][2:4]))
+                if AplusB(guess6) == 3:
+                    hints(next_best_guess(guess1[0][1:3] + guess2[0][1] + guess2[0][3]))
+
+        if AplusB(guess3) == 2 and AplusB(guess4) == 2:
+            guess5 = hints(next_best_guess(guess1[0][1] + guess2[0][1:4]))
+            if AplusB(guess5) == 1:
+                guess6 = hints(next_best_guess(guess1[0][0] + guess1[0][2] + guess2[0][0:2]))
+                if AplusB(guess6) == 2:
+                    guess7 = hints(next_best_guess(guess1[0][2:4] + guess2[0][0] + guess2[0][2]))
+                    if AplusB(guess7) == 2:
+                        hints(next_best_guess(guess1[0][1:3] + guess2[0][0] + guess2[0][3]))  # 1467 or 2358
+                if AplusB(guess6) == 3:
+                    guess7 = hints(next_best_guess(guess1[0][0] + guess1[0][2] + guess2[0][0] + guess2[0][2]))
+                    if AplusB(guess7) == 2:
+                        hints(next_best_guess(guess1[0][2:4] + guess2[0][0:2]))
+            if AplusB(guess5) == 2:
+                hints(next_best_guess(guess1[0][0] + guess1[0][3] + guess2[0][1:3]))  # 1467 or 2358
+            if AplusB(guess5) == 3:
+                guess6 = hints(next_best_guess(guess1[0][0:2] + guess2[0][1] + guess2[0][3]))
+                if AplusB(guess6) == 2:
+                    guess7 = hints(next_best_guess(guess1[0][0:2] + guess2[0][2:4]))
+                    if AplusB(guess7) == 2:
+                        hints(next_best_guess(guess1[0][0] + guess1[0][3] + guess2[0][1:3]))  # 1467 or 2358
+                    if AplusB(guess7) == 3:
+                        hints(next_best_guess(guess1[0][1] + guess1[0][3] + guess2[0][2:4]))
+                if AplusB(guess6) == 3:
+                    guess7 = hints(next_best_guess(guess1[0][0:2] + guess2[0][2:4]))
+                    if AplusB(guess7) == 2:
+                        hints(next_best_guess(guess1[0][1] + guess1[0][3] + guess2[0][1] + guess2[0][3]))
+
+        if AplusB(guess3) == 1 and AplusB(guess4) == 3:
+            guess5 = hints(next_best_guess(guess1[0][2:4] + guess2[0][2:4]))
+            if AplusB(guess5) == 2:
+                hints(next_best_guess(guess1[0][0] + guess1[0][2] + guess2[0][1] + guess2[0][3]))
+            if AplusB(guess5) == 3:
+                guess6 = hints(next_best_guess(guess1[0][2:4] + guess2[0][1] + guess2[0][3]))
+                if AplusB(guess6) == 2:
+                    hints(next_best_guess(guess1[0][0] + guess1[0][2] + guess2[0][2:4]))
+            if AplusB(guess5) == 4:
+                # TODO: May not need this guess if it's already 4A. e.g. 7843
+                hints(next_best_guess(guess5[0]))
+
+        if AplusB(guess3) == 1 and AplusB(guess4) == 2:
+            hints(next_best_guess(guess1[0][0] + guess1[0][3] + guess2[0][0] + guess2[0][3]))
+
+
 def from_2B_to_3B(guess):
-    # Based on the following 1~2 guesses, all 12 groups are: 12, 13, 21, 22, 3
+    # Based on the following 1~2 guesses, all 12 groups are formed: 12, 13, 21, 22, 3
     guess3 = hints(pick_x_number_from_not_used(1) + guess[0][0:3])
 
     if AplusB(guess3) == 3:
-        # This particular return is to provide 2 incorrect numbers for later use by from_no_info_3B_to_4A.
-        print (guess3[0], guess3[1], pick_x_number_from_not_used(1) + guess[0][3])
-        return (guess3[0], guess3[1], pick_x_number_from_not_used(1) + guess[0][3])
+        # This returns 2 incorrect numbers (i.e. the 3rd element) for later use by from_no_info_3B_to_4A.
+        return guess3[0], guess3[1], pick_x_number_from_not_used(1) + guess[0][3]
 
     else:
         guess4 = hints(guess[0][1:4] + pick_x_number_from_not_used(1))
@@ -699,11 +786,11 @@ def play():
         else:
             from_3B_to_4A(three_b, guess2)
 
-    '''if AplusB(guess1) == 2 and AplusB(guess2) == 2:
-        print 22'''
+    if AplusB(guess1) == 2 and AplusB(guess2) == 2:
+        from_2B_to_4A(guess1, guess2)
 
 
 if __name__ == '__main__':
-    number = '1953'
+    number = '8523'
     play()
     print info
