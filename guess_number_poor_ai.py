@@ -106,7 +106,7 @@ def next_best_guess(guess, return_type='string'):
     #  To utilize '1A0B' to exclude invalid numbers ('1A0B' means the correct number is in the correct positions).
     for i in guess:
         for j in info:
-            if i in j and info[j][0] == 1 and info[j][1] == 0 and list(j).index(i) == list(guess).index(i):
+            if i in j and info[j][0] == 1 and info[j][1] == 0:  # and list(j).index(i) == list(guess).index(i):
                 index = list(j).index(i)
                 for k in full_list:
                     if k[index] != i:
@@ -248,10 +248,10 @@ def filter_group200(guess1, guess2):
 
 
 # "no_info_4B" here means there's no previous guess, all information we have is this guess of 4B.
-def from_no_info_4B_to_4A(information):
+def from_no_info_4B_to_4A():
     # First, find the guess that contains all 4 correct numbers, assigned to guess1.
     guess1 = []
-    for i in information.items():
+    for i in info.items():
         if i[1][0] + i[1][1] == 4:
             guess1 = i
 
@@ -289,9 +289,9 @@ def from_no_info_4B_to_4A(information):
                 hints(let_2nd_be_4th(guess4))
 
 
-def from_4B_to_4A(guess, return_type='string'):
+def from_4B_to_4A(guess, return_type='string'):  # guess[0][0], guess[0][1], guess[0][2], guess[0][3]
     to_be_deleted = []  # To store all invalid numbers and then delete in one go.
-    full_list = list(permutations([guess[0][0], guess[0][1], guess[0][2], guess[0][3]]))  # All possible combinations.
+    full_list = list(permutations([guess[0][i] for i in range(0, 4)]))  # All possible combinations.
     # count is used to select those numbers of which we want to divided by different categories.
     count = 0
     print 'from_4B_to_4A:all '
@@ -362,7 +362,10 @@ def from_2B_to_3B(guess):
     guess3 = hints(pick_x_number_from_not_used(1) + guess[0][0:3])
 
     if AplusB(guess3) == 3:
-        return guess3
+        # This particular return is to provide 2 incorrect numbers for later use by from_no_info_3B_to_4A.
+        print (guess3[0], guess3[1], pick_x_number_from_not_used(1) + guess[0][3])
+        return (guess3[0], guess3[1], pick_x_number_from_not_used(1) + guess[0][3])
+
     else:
         guess4 = hints(guess[0][1:4] + pick_x_number_from_not_used(1))
 
@@ -372,6 +375,7 @@ def from_2B_to_3B(guess):
             return guess4[0][1:4] + guess4[0][0], [-1, 0, 4]
 
         # Below 3 ifs are special cases that will be handled by from_definite_3B_to_4A.
+        # Also, only these 3 ifs returns 3 numbers, instead of 4.
         if AplusB(guess3) == 2 and AplusB(guess4) == 3:
             return guess4[0][0:2] + guess4[0][3]
 
@@ -394,9 +398,132 @@ def from_2B_to_3B(guess):
     return None
 
 
+# '2B_and_2' means besides the 2 definite correct numbers, the other 2 correct numbers are both from another 1 guess.
+def from_definite_2B_and_2_to_4A(guess, two_definite_correct_numbers = pick_x_number_from_not_used(2)):
+    # Because there are only 2 correct numbers from first 2 guesses, so the 2 un-guessed numbers must be correct,
+    # namely 'two_definite_correct_numbers' as the 2nd variable for this function.
+
+    # two_numbers and other_two_numbers are the 4 numbers that form guess.
+    two_numbers = pick_number_from_a_string(guess[0], 2)
+    other_two_numbers = get_number_left_unpicked_from_a_guess(guess[0], two_numbers)
+
+    # one_number and another_number are from two_numbers.
+    one_number = pick_number_from_a_string(two_numbers, 1)
+    another_number = get_number_left_unpicked_from_a_guess(two_numbers, one_number)
+
+    # one_number_in_others and another_number_in_others are from other_two_numbers.
+    one_number_in_others = pick_number_from_a_string(other_two_numbers, 1)
+    another_number_in_others = get_number_left_unpicked_from_a_guess(other_two_numbers, one_number_in_others)
+
+    # TODO: think about how to use next_best_guess().
+    guess3 = hints(two_definite_correct_numbers + two_numbers)
+
+    if AplusB(guess3) == 4:
+        # TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+        hints(from_4B_to_4A(guess3))
+
+    elif AplusB(guess3) == 2:
+        # TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+        hints(from_4B_to_4A((two_definite_correct_numbers + other_two_numbers, [0, 0, 0])))
+
+    elif AplusB(guess3) == 3:
+        # TODO: think about how to use next_best_guess().
+        guess4 = hints(two_definite_correct_numbers + one_number + one_number_in_others)
+        if AplusB(guess4) == 4:
+            # TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+            hints(from_4B_to_4A(guess4))
+        elif AplusB(guess4) == 2:
+            # TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+            print two_definite_correct_numbers + another_number + another_number_in_others
+            hints(from_4B_to_4A((two_definite_correct_numbers + another_number + another_number_in_others, [0, 0, 0])))
+        elif AplusB(guess4) == 3:
+            guess5 = hints(next_best_guess(two_definite_correct_numbers + one_number + another_number_in_others))
+            if AplusB(guess5) == 4:
+                hints(from_4B_to_4A(guess5))
+            elif AplusB(guess5) == 2:
+                hints(next_best_guess(two_definite_correct_numbers + one_number_in_others + another_number))
+
+
+# '2B_and_1' means besides the 2 definite correct numbers, the other 2 correct numbers are different 2 guess (1+1).
+def from_definite_2B_and_1_to_4A(guess1, guess2):
+    # Because there are only 2 correct numbers from first 2 guesses, so the 2 un-guessed numbers must be correct.
+    two_definite_correct_numbers = pick_x_number_from_not_used(2)
+
+    # two_numbers and other_two_numbers are the 4 numbers that form guess1.
+    two_numbers_in_guess1 = pick_number_from_a_string(guess1[0], 2)
+    other_two_numbers_in_guess1 = get_number_left_unpicked_from_a_guess(guess1[0], two_numbers_in_guess1)
+
+    # two_numbers and other_two_numbers are the 4 numbers that form guess2.
+    two_numbers_in_guess2 = pick_number_from_a_string(guess2[0], 2)
+    other_two_numbers_in_guess2 = get_number_left_unpicked_from_a_guess(guess2[0], two_numbers_in_guess2)
+
+    # These 2 guesses are trying to find the correct numbers from which half.
+    # TODO: think about how to use next_best_guess().
+    guess_1 = hints(two_definite_correct_numbers + two_numbers_in_guess1)
+    guess_2 = hints(two_definite_correct_numbers + two_numbers_in_guess2)
+
+    if AplusB(guess_1) == 3 and AplusB(guess_2) == 3:
+        two_other_correct_numbers_are_in_this_guess = two_numbers_in_guess1 + two_numbers_in_guess2
+    if AplusB(guess_1) == 3 and AplusB(guess_2) == 2:
+        two_other_correct_numbers_are_in_this_guess = two_numbers_in_guess1 + other_two_numbers_in_guess2
+    if AplusB(guess_1) == 2 and AplusB(guess_2) == 3:
+        two_other_correct_numbers_are_in_this_guess = other_two_numbers_in_guess1 + two_numbers_in_guess2
+    if AplusB(guess_1) == 2 and AplusB(guess_2) == 2:
+        two_other_correct_numbers_are_in_this_guess = other_two_numbers_in_guess1 + other_two_numbers_in_guess2
+
+    from_definite_2B_and_2_to_4A((two_other_correct_numbers_are_in_this_guess, [0, 0, 0]), two_definite_correct_numbers)
+
+
 # "no_info_3B" here means there's no previous guess from which we can deduct at least 2 correct numbers in this 3B.
 def from_no_info_3B_to_4A(guess, guess1):
-    pass
+    # This if is to identify the last correct number from 2 numbers (not 4).
+    if len(guess1[0]) == 4:
+        # two_numbers are from guess1.
+        two_numbers = pick_number_from_a_string(guess1[0], 2)
+        if len(guess) == 2:
+            # TODO: think about how to use next_best_guess().
+            guess3 = hints(pick_x_number_from_not_used(2) + two_numbers)
+        elif len(guess) == 3:
+            # TODO: think about how to use next_best_guess().
+            guess3 = hints(guess[2] + two_numbers)
+
+        if AplusB(guess3) == 0:
+            two_numbers = get_number_left_unpicked_from_a_guess(guess1[0], two_numbers)
+
+    else:  # Length is equal to 2 for all other cases.
+        two_numbers = pick_x_number_from_not_used(2)
+
+    # Now the last correct number is either in one_number or in another_number.
+    one_number = pick_number_from_a_string(two_numbers, 1)
+    another_number = get_number_left_unpicked_from_a_guess(two_numbers, one_number)
+
+    guess3 = hints(one_number + guess[0][0:3])
+
+    if AplusB(guess3) == 4:
+        # TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+        hints(from_4B_to_4A(guess3))
+
+    else:
+        guess4 = hints(guess[0][1:4] + another_number)
+
+        if AplusB(guess3) == 2 and AplusB(guess4) == 3:
+            guess5 = hints(next_best_guess(guess3[0][1:3] + guess4[0][2:4]))
+            if AplusB(guess5) != 4:
+                hints(next_best_guess(guess3[0][1] + guess4[0][1:4]))
+
+        if AplusB(guess3) == 2 and AplusB(guess4) == 4:
+            # TODO: need to enhance the logic (also need to enhance pick_until_4A()).
+            hints(from_4B_to_4A(guess4))
+
+        if AplusB(guess3) == 3 and AplusB(guess4) == 2:
+            guess5 = hints(next_best_guess(guess4[0][1:3] + guess3[0][2:4]))
+            if AplusB(guess5) != 4:
+                hints(next_best_guess(guess4[0][1] + guess3[0][1:4]))
+
+        if AplusB(guess3) == 3 and AplusB(guess4) == 3:
+            guess5 = hints(next_best_guess(guess3[0][0] + guess4[0][0:3]))
+            if AplusB(guess5) != 4:
+                hints(next_best_guess(guess4[0][3] + guess3[0][1:4]))
 
 
 def from_3B_to_4A(guess, guess1):
@@ -475,6 +602,7 @@ def from_3B_to_4A(guess, guess1):
 
 
 # "definite_3B" here means the 3 correct numbers had been confirmed.
+# The variable 'three' here contains and only contain all 3 correct numbers.
 def from_definite_3B_to_4A(three, guess):
     # two_numbers and other_two_numbers are the 4 numbers that form guess.
     two_numbers = pick_number_from_a_string(guess[0], 2)
@@ -491,14 +619,22 @@ def from_definite_3B_to_4A(three, guess):
     guess5 = hints(next_best_guess(three[0:2] + two_numbers))
 
     if AplusB(guess5) == 2:
-        guess6 = hints(next_best_guess(three + one_number_in_others))
-        if AplusB(guess6) == 3:
+        temp = next_best_guess(three + one_number_in_others)
+        if temp is None:  # Because there is no valid guess for temp, so we move onto make next available guess.
             hints(next_best_guess(three + another_number_in_others))
+        else:
+            guess6 = hints(next_best_guess(temp))
+            if AplusB(guess6) == 3:
+                hints(next_best_guess(three + another_number_in_others))
 
     if AplusB(guess5) == 3:
-        guess6 = hints(next_best_guess(three + one_number))
-        if AplusB(guess6) == 3:
+        temp = next_best_guess(three + one_number)
+        if temp is None:  # Because there is no valid guess for temp, so we move onto make next available guess.
             hints(next_best_guess(three + another_number))
+        else:
+            guess6 = hints(next_best_guess(temp))
+            if AplusB(guess6) == 3:
+                hints(next_best_guess(three + another_number))
 
 
 def play():
@@ -509,35 +645,45 @@ def play():
     # Similar algorithm for group 4 & 04 ---------------------------------------
     if AplusB(guess1) == 4:
         if guess1[1][0] != 4:
-            from_no_info_4B_to_4A(info)
+            from_no_info_4B_to_4A()
     else:
         guess2 = hints('5678')
         # guess2 = hints(pick_x_number_not_used(4))
 
     if AplusB(guess1) == 0 and AplusB(guess2) == 4:
-        from_no_info_4B_to_4A(info)
+        from_no_info_4B_to_4A()
 
-    '''if AplusB(guess1) == 0 and AplusB(guess2) == 2:
-        print '02'
+    # Similar algorithm for group 02 & 20 & 11 ---------------------------------------
+    if AplusB(guess1) == 1 and AplusB(guess2) == 1:
+        from_definite_2B_and_1_to_4A(guess1, guess2)
+
+    if AplusB(guess1) == 0 and AplusB(guess2) == 2:
+        from_definite_2B_and_2_to_4A(guess2)
         
     if AplusB(guess1) == 2 and AplusB(guess2) == 0:
-        print 20
+        from_definite_2B_and_2_to_4A(guess1)
 
+    # Similar algorithm for group 03 & 30 & 13 & 31 ---------------------------------------
     if AplusB(guess1) == 0 and AplusB(guess2) == 3:
-        print '03
+        from_no_info_3B_to_4A(guess2, pick_x_number_from_not_used(2))
 
-    if AplusB(guess1) == 1 and AplusB(guess2) == 1:
-        print 11'''
+    if AplusB(guess1) == 3 and AplusB(guess2) == 0:
+        from_no_info_3B_to_4A(guess1, pick_x_number_from_not_used(2))
+
+    if AplusB(guess1) == 1 and AplusB(guess2) == 3:
+        from_no_info_3B_to_4A(guess2, guess1)
+
+    if AplusB(guess1) == 3 and AplusB(guess2) == 1:
+        from_no_info_3B_to_4A(guess1, guess2)
 
     # Similar algorithm for group 12 & 21 ---------------------------------------
-
     if AplusB(guess1) == 1 and AplusB(guess2) == 2:
         three_b = from_2B_to_3B(guess2)
 
         # 3 different cases to reach 4A, each deducted with a different functions(no_info, definite and normal).
         if len(info) == 3:
             from_no_info_3B_to_4A(three_b, guess1)
-        elif len(info) == 4 and three_b[1][0] != -1:
+        elif len(info) == 4 and three_b[1][0] != -1:  # This '-1' is a flag, only take care group '13' in from_2B_to_3B.
             from_definite_3B_to_4A(three_b, guess1)
         else:
             from_3B_to_4A(three_b, guess1)
@@ -553,20 +699,11 @@ def play():
         else:
             from_3B_to_4A(three_b, guess2)
 
-    '''if AplusB(guess1) == 1 and AplusB(guess2) == 3:
-            print 13
-            
-    if AplusB(guess1) == 2 and AplusB(guess2) == 2:
-        print 22
-        
-    if AplusB(guess1) == 3 and AplusB(guess2) == 0:
-        print 30
-        
-    if AplusB(guess1) == 3 and AplusB(guess2) == 1:
-        print 31'''
+    '''if AplusB(guess1) == 2 and AplusB(guess2) == 2:
+        print 22'''
 
 
 if __name__ == '__main__':
-    number = '4580'
+    number = '1953'
     play()
     print info
