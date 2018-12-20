@@ -405,20 +405,26 @@ def from_2B_to_4A(guess1, guess2):
                         from_4B_to_4A(guess1[0][2:4] + guess2[0][0:2])
                     elif guess7[1][0] != 4:
                         from_4B_to_4A(guess7)
+                if AplusB(guess6) == 4 and guess6[1][0] != 4:
+                    from_4B_to_4A(guess6)
             if AplusB(guess5) == 2:
                 guess6 = hints(next_best_guess(guess1[0][1:3] + guess2[0][0] + guess2[0][3]))
                 if AplusB(guess6) == 0:
                     from_4B_to_4A(guess1[0][0] + guess1[0][3] + guess2[0][1:3])
+                if AplusB(guess6) == 4 and guess6[1][0] != 4:
+                    from_4B_to_4A(guess6)
             if AplusB(guess5) == 3:
                 guess6 = hints(next_best_guess(guess1[0][0:2] + guess2[0][1] + guess2[0][3]))
                 if AplusB(guess6) == 2:
-                    from_4B_to_4A(guess1[0][1] + guess1[0][3] + guess2[0][1] + guess2[0][3])
+                    from_4B_to_4A(guess1[0][1] + guess1[0][3] + guess2[0][2:4])
                 if AplusB(guess6) == 3:
                     guess7 = hints(next_best_guess(guess1[0][0:2] + guess2[0][2:4]))
                     if AplusB(guess7) == 2:
                         from_4B_to_4A(guess1[0][1] + guess1[0][3] + guess2[0][1] + guess2[0][3])
                     elif guess7[1][0] != 4:
                         from_4B_to_4A(guess7)
+                if AplusB(guess6) == 4 and guess6[1][0] != 4:
+                    from_4B_to_4A(guess6)
             if AplusB(guess5) == 4 and guess5[1][0] != 4:
                 from_4B_to_4A(guess5)
 
